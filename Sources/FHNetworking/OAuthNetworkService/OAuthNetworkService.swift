@@ -136,6 +136,12 @@ public final class OAuthNetworkService: FHNetworkService {
                 authorizationHandler.authorize(url: authorizeUrl, callbackUrl: self.callbackUrl) { result in
                     switch result {
                     case let .success(response):
+
+                        guard response.oauthToken == requestToken else {
+                            completion(.failure(.authorizationFailed(nil)))
+                            return
+                        }
+
                         self.getAccessTokenWith(requestToken: requestToken, requestTokenSecret: requestTokenSecret, oauthVerifier: response.oauthVerifier) { result in
                             switch result {
                             case let .success(response):
