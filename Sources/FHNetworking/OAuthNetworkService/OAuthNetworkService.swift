@@ -127,7 +127,6 @@ public final class OAuthNetworkService: FHNetworkService {
             case let .success(response):
                 let requestToken = response.requestToken
                 let requestTokenSecret = response.requestTokenSecret
-
                 guard let authorizeUrl = self.authorizeUrlFrom(requestToken: requestToken,
                                                                requestTokenSecret: requestTokenSecret) else {
                     completion(.failure(.authorizationFailed(.requestCreationFailed)))
@@ -157,6 +156,8 @@ public final class OAuthNetworkService: FHNetworkService {
 
     // MARK: Get Request Token
 
+    private var requestRequestTokenTries = 0
+
     /// Requests the *Request Token*.
     ///
     /// - Parameters:
@@ -166,6 +167,7 @@ public final class OAuthNetworkService: FHNetworkService {
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
             case let .success(response):
+                self.requestRequestTokenTries = 0
                 guard let data = response, let query = String(bytes: data, encoding: .utf8),
                     let responseDic = query.decodeQueryEncoded(),
                     responseDic["oauth_callback_confirmed"] == "1",
@@ -177,12 +179,21 @@ public final class OAuthNetworkService: FHNetworkService {
                 completion(.success((requestToken: requestToken,
                                      requestTokenSecret: requestTokenSecret)))
             case let .failure(error):
-                completion(.failure(.getRequestTokenFailed(error)))
+                guard self.requestRequestTokenTries < 5 else {
+                    completion(.failure(.getRequestTokenFailed(error)))
+                    self.requestRequestTokenTries = 0
+                    return
+                }
+                print("\(self.requestRequestTokenTries) try for accesss token: \(error.localizedDescription)")
+                self.getRequestToken(completion: completion)
             }
         }
+        requestRequestTokenTries += 1
     }
 
     // MARK: Get Access Token
+
+    private var requestAccessTokenTries = 0
 
     /// Requests the  permanent *Access Token*.
     ///
@@ -196,6 +207,7 @@ public final class OAuthNetworkService: FHNetworkService {
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
             case let .success(response):
+                self.requestAccessTokenTries = 0
                 guard let data = response, let query = String(bytes: data, encoding: .utf8),
                     let responseDic = query.decodeQueryEncoded(),
                     let requestToken = responseDic["oauth_token"] as? String,
@@ -206,8 +218,16 @@ public final class OAuthNetworkService: FHNetworkService {
                 completion(.success((accessToken: requestToken,
                                      accessTokenSecret: requestTokenSecret)))
             case let .failure(error):
-                completion(.failure(.getAccessTokenFailed(error)))
+                guard self.requestAccessTokenTries < 5 else {
+                    completion(.failure(.getRequestTokenFailed(error)))
+                    self.requestAccessTokenTries = 0
+                    return
+                }
+                print("\(self.requestAccessTokenTries) try for accesss token: \(error.localizedDescription)")
+                self.getAccessTokenWith(requestToken: requestToken, requestTokenSecret: requestTokenSecret,
+                                   oauthVerifier: oauthVerifier, completion: completion)
             }
         }
+        requestAccessTokenTries += 1
     }
 }
