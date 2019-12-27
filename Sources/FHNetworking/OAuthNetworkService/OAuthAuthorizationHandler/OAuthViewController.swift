@@ -9,12 +9,16 @@
     import SafariServices
     import UIKit
 
+    /// Basic implementation for authentication with OAuth.
     @available(iOS 11.0, *)
     open class OAuthViewController: UIViewController, OAuthAuthoriationHandler {
+        /// The current `OAuthNetworkService`.
         open var networkService: OAuthNetworkService?
+        /// The used authentication session.
         private var session: FHAuthenticatingSession?
 
-        public func authorize() {
+        /// Starts the OAuth Authentication.
+        public func startAuthentication() {
             guard let networkService = networkService else {
                 fatalError("No network service set.")
             }
@@ -28,10 +32,15 @@
             }
         }
 
+        /// Called when authentication is completed or failed.
         open func authorizationCompleted(
             with _: Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>
         ) {}
 
+        /// Called from the network service for user authorization.
+        ///
+        /// The method performs user authorization with `SFAuthenticationSession` prior to iOS 12 and
+        /// with `ASWebAuthenticationSession` above.
         public func authorize(
             url: URL, callbackUrl: String?,
             completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void
@@ -57,6 +66,12 @@
             }
         }
 
+        /// Returns the used session depending on the current OS.
+        ///
+        /// - Parameters:
+        ///     - url: Authentication url.
+        ///     - callbackURLScheme: Url to be called at the end.
+        ///     - completionHandler: Handler to be called at the end.
         private func session(url: URL, callbackURLScheme: String?,
                              completionHandler: @escaping (URL?, Error?) -> Void) -> FHAuthenticatingSession {
             if #available(iOS 12, *) {
@@ -73,6 +88,7 @@
         }
     }
 
+    /// Implementation of `ASWebAuthenticationPresentationContextProviding`.
     @available(iOS 11.0, *)
     extension OAuthViewController: ASWebAuthenticationPresentationContextProviding {
         @available(iOS 12.0, *)
@@ -81,18 +97,31 @@
         }
     }
 
+    /// Abstraction of `SFAuthenticationSession` and `ASWebAuthentication`.
     protocol FHAuthenticatingSession {
+        /// Initializes `FHAuthenticatingSession`.
+        ///
+        /// - Parameters:
+        ///     - url: Authentication url.
+        ///     - callbackURLScheme: Url to be called at the end.
+        ///     - completionHandler: Handler to be called at the end.
         init(url URL: URL,
              callbackURLScheme: String?,
              completionHandler: @escaping (URL?, Error?) -> Void)
 
+        /// Starts the authentication.
+        ///
+        /// - Returns: Success state of authentication.
         func start() -> Bool
+        /// Cancels authentication.
         func cancel()
     }
 
+    /// Make `ASWebAuthenticationSession` conforming to`ASWebAuthenticationSession`.
     @available(iOS 12.0, *)
     extension ASWebAuthenticationSession: FHAuthenticatingSession {}
 
+    /// Make `SFAuthenticationSession` conforming to`ASWebAuthenticationSession`.
     @available(iOS 11.0, *)
     extension SFAuthenticationSession: FHAuthenticatingSession {}
 #endif
