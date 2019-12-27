@@ -22,6 +22,7 @@ public enum FHNetworkError: Error {
     /// No user has been set to the service.
     case noUser
 
+    /// Readable description of error
     public var localizedDescription: String {
         switch self {
         case let .httpError(status, data):
