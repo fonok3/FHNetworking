@@ -4,9 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "FHNetworking",
-    platforms: [
-        .macOS(.v10_15), .iOS(.v9), .tvOS(.v9),
-    ],
+    platforms: [.iOS(.v9), .macOS(.v10_10), .watchOS(.v2)],
     products: [
         .library(
             name: "FHNetworking",
