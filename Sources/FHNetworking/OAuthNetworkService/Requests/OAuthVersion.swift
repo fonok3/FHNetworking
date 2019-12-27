@@ -6,5 +6,5 @@
 /// Supported OAuth Versions
 public enum OAuthVersion: String {
     /// Version 1.0
-    case v1 = "1.0"
+    case v01 = "1.0"
 }

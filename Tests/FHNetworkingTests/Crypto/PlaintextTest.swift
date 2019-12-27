@@ -23,10 +23,8 @@ final class PlaintextTest: XCTestCase {
         (string: "3f4a921d36ce9ce47d0d13c5d85f2b0ff8318d28",
          hash: "3f4a921d36ce9ce47d0d13c5d85f2b0ff8318d28"),
         (string: "f63b931bd47417a81a538327af927da3eike875s",
-         hash: "f63b931bd47417a81a538327af927da3eike875s")
+         hash: "f63b931bd47417a81a538327af927da3eike875s"),
     ]
-
-
 
     func testHashing() {
         for hash in exampleHashes {
