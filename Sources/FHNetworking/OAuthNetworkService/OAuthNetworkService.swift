@@ -163,7 +163,8 @@ public final class OAuthNetworkService: FHNetworkService {
     ///
     /// - Parameters:
     ///     - completion: The handler for processing the request result.
-    func getRequestToken(completion: @escaping (Result<(requestToken: String, requestTokenSecret: String), OAuthNetworkError>) -> Void) {
+    func getRequestToken(completion: @escaping (Result<(requestToken: String,
+                                                        requestTokenSecret: String), OAuthNetworkError>) -> Void) {
         let request = OAuthNetworkRequest.requestRequestToken(path: requestTokenPath)
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
@@ -201,9 +202,10 @@ public final class OAuthNetworkService: FHNetworkService {
     ///     - requestTokenSecret: The temporary *OAuth Request Token Secret*.
     ///     - authorizationHandler: Handler for user authorization.
     ///     - completion: The handler for processing the request result.
-    private func authorizeRequestToken(requestToken: String, requestTokenSecret: String,
-                                       with authorizationHandler: OAuthAuthoriationHandler,
-                                       completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void) {
+    private func authorizeRequestToken(
+        requestToken: String, requestTokenSecret: String, with authorizationHandler: OAuthAuthoriationHandler,
+        completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void
+    ) {
         guard let authorizeUrl = self.authorizeUrlFrom(requestToken: requestToken,
                                                        requestTokenSecret: requestTokenSecret) else {
             completion(.failure(.authorizationFailed(.requestCreationFailed)))
@@ -235,9 +237,13 @@ public final class OAuthNetworkService: FHNetworkService {
     ///     - requestToken: The temporary *OAuth Request Token*.
     ///     - requestTokenSecret: The temporary *OAuth Request Token Secret*.
     ///     - completion: The handler for processing the request result
-    func getAccessTokenWith(requestToken: String, requestTokenSecret: String, oauthVerifier: String,
-                            completion: @escaping (Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) -> Void) {
-        let request = OAuthNetworkRequest.requestAccessToken(path: accessTokenPath, token: requestToken, tokenSecret: requestTokenSecret, verifier: oauthVerifier)
+    func getAccessTokenWith(
+        requestToken: String, requestTokenSecret: String, oauthVerifier: String,
+        completion: @escaping (Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) -> Void
+    ) {
+        let request = OAuthNetworkRequest.requestAccessToken(
+            path: accessTokenPath, token: requestToken, tokenSecret: requestTokenSecret, verifier: oauthVerifier
+        )
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
             case let .success(response):
