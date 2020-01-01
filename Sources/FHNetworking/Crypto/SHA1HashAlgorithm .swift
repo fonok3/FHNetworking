@@ -21,7 +21,7 @@ public class SHA1HashAlgorithm: HashAlgorithm {
     public func hash(string: String, with key: String) -> String {
         guard let messageData = string.data(using: .utf8),
             let keyData = key.data(using: .utf8) else {
-            return ""
+                return ""
         }
         return signature(for: messageData, key: keyData).base64EncodedString()
     }

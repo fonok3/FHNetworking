@@ -38,7 +38,7 @@ public struct OAuthAuthentication {
                 consumerToken: String, consumerTokenSecret: String,
                 token: String? = nil, tokenSecret: String? = nil,
                 verifier: String? = nil, nonce: String = UUID().uuidString,
-                hashAlgorithm: HashAlgorithm = SHA1HashAlgorithm(), version: OAuthVersion = .v01,
+                hashAlgorithm: HashAlgorithm = SHA1HashAlgorithm(), version: OAuthVersion = .v1,
                 timestamp: String = String(Date().timeIntervalSince1970)) {
         self.fullPath = fullPath
         self.method = method
