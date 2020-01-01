@@ -12,7 +12,7 @@ public enum OAuthNetworkError: Error {
     /// Error retrieving *Access Token*
     case getAccessTokenFailed(FHNetworkError?)
 
-    /// Readable description of error
+    /// Localized description of the error
     public var localizedDescription: String {
         switch self {
         case let .getRequestTokenFailed(error):
