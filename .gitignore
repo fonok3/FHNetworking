@@ -39,3 +39,5 @@ Package.resolved
 .build/
 
 /Tests/FHNetworkingTests/StudIPAPI/
+
+.idea/
