@@ -19,16 +19,18 @@ extension FHNetworkService {
 
     /// Executes network request with an optional data response.
     ///
-    /// The method converts the given request to an `URLRequest` for requesting with `URLSession`
+    /// The method converts the given request to an `URLRequest` for requesting with `URLSession`.
     ///
     /// - Parameters:
     ///     - request: Network request to be executed
     ///     - completion: Handler for the request result
+    ///     - additionalParameters: Additional query parameters
     /// - Returns: The created url session task
     @discardableResult
     public func request(_ request: FHNetworkRequest,
+                        additionalParameters: [URLQueryItem] = [URLQueryItem](),
                         completion: @escaping (Result<Data?, FHNetworkError>) -> Void) -> URLSessionDataTask? {
-        guard var urlRequest = request.request(with: self.baseUrl) else {
+        guard var urlRequest = request.request(with: self.baseUrl, additionalParameters: additionalParameters) else {
             completion(.failure(.requestCreationFailed))
             return nil
         }
@@ -41,16 +43,18 @@ extension FHNetworkService {
     /// Executes network request with a JSON response.
     ///
     /// The method converts the given request to an `URLRequest` for requesting with
-    ///  `URLSession` and tries to convert the data to the expected response type
+    ///  `URLSession` and tries to convert the data to the expected response type.
     ///
     /// - Parameters:
     ///     - request: Network request to be executed
     ///     - completion: Handler for the request result
+    ///     - additionalParameters: Additional query parameters
     /// - Returns: The created url session task
     @discardableResult
     public func request<T: Decodable>(_ request: FHNetworkRequest,
+                                      additionalParameters: [URLQueryItem] = [URLQueryItem](),
                                       completion: @escaping (Result<T, FHNetworkError>) -> Void) -> URLSessionDataTask? {
-        return self.request(request) { result in
+        return self.request(request, additionalParameters: additionalParameters) { result in
             switch result {
             case let .success(data):
                 let data = data ?? "".data(using: .utf8)!

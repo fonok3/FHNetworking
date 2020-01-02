@@ -21,6 +21,7 @@ public protocol FHNetworkService {
     ///     - completion: Handler for the request result
     /// - Returns: The created url session task
     @discardableResult func request(_ request: FHNetworkRequest,
+                                    additionalParameters: [URLQueryItem],
                                     completion: @escaping (Result<Data?, FHNetworkError>) -> Void)
         -> URLSessionDataTask?
 
@@ -31,6 +32,7 @@ public protocol FHNetworkService {
     ///     - completion: Handler for the request result
     /// - Returns: The created url session task
     @discardableResult func request<T: Decodable>(_ request: FHNetworkRequest,
+                                                  additionalParameters: [URLQueryItem],
                                                   completion: @escaping (Result<T, FHNetworkError>) -> Void)
         -> URLSessionDataTask?
 

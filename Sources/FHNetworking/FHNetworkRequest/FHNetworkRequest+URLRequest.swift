@@ -10,9 +10,10 @@ extension FHNetworkRequest {
     /// Creates `URLRequest` request against base url
     ///
     /// - Parameters:
-    ///     - baseUrl: base url to which the request path is relatively
+    ///     - baseUrl: *Base Url* to which the request path is relatively.
+    ///     - additionalParameters: Additional query parameters.
     /// - Returns: Corresponding `URLRequest`.`
-    func request(with baseUrl: String) -> URLRequest? {
+    func request(with baseUrl: String, additionalParameters: [URLQueryItem] = [URLQueryItem]()) -> URLRequest? {
         guard let baseURL = URL(string: baseUrl) else {
             return nil
         }
@@ -22,6 +23,7 @@ extension FHNetworkRequest {
         urlComponents.host = baseURL.host
         urlComponents.path = baseURL.path + path.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         urlComponents.queryItems = parameters
+        urlComponents.queryItems?.append(contentsOf: additionalParameters)
 
         guard let finalURL = urlComponents.url else {
             return nil
