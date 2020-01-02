@@ -94,7 +94,6 @@ public struct OAuthAuthentication {
     ///
     /// The getter hashes the *Signature Base String* with the defined *Hash Algorithm*.
     private var oauthSignature: String {
-        print(signatureBaseString)
         return hashAlgorithm.hash(string: signatureBaseString,
                                   with: signingKey)
     }
