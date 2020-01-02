@@ -19,11 +19,12 @@ extension FHNetworkService {
 
     /// Executes network request with an optional data response.
     ///
-    /// The method converts the given request to an `URLRequest` for requesting with `URLSession`
+    /// The method converts the given request to an `URLRequest` for requesting with `URLSession`.
     ///
     /// - Parameters:
     ///     - request: Network request to be executed
     ///     - completion: Handler for the request result
+    ///     - additionalParameters: Additional query parameters
     /// - Returns: The created url session task
     @discardableResult
     public func request(_ request: FHNetworkRequest,
@@ -42,11 +43,12 @@ extension FHNetworkService {
     /// Executes network request with a JSON response.
     ///
     /// The method converts the given request to an `URLRequest` for requesting with
-    ///  `URLSession` and tries to convert the data to the expected response type
+    ///  `URLSession` and tries to convert the data to the expected response type.
     ///
     /// - Parameters:
     ///     - request: Network request to be executed
     ///     - completion: Handler for the request result
+    ///     - additionalParameters: Additional query parameters
     /// - Returns: The created url session task
     @discardableResult
     public func request<T: Decodable>(_ request: FHNetworkRequest,
