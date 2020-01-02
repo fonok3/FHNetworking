@@ -95,7 +95,7 @@ public final class OAuthNetworkService: FHNetworkService {
         } else {
             return OAuthAuthentication(fullPath: baseUrl + request.path, method: request.method,
                                        consumerToken: consumerToken, consumerTokenSecret: consumerTokenSecret,
-                                       token: accessToken, tokenSecret: accessTokenSecret)
+                                       token: accessToken, tokenSecret: accessTokenSecret, queryParameters: request.parameters)
                 .header
         }
     }
