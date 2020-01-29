@@ -18,6 +18,7 @@ public struct OAuthAuthentication {
     private let version: OAuthVersion
     private let hashAlgorithm: HashAlgorithm
     private let timestamp: String
+    private let queryParameters: [URLQueryItem]
 
     /// Initializes the OAuthAuthentication with at least *Full Request Path*, *HTTP
     ///  Method*, *Consumer Token* and *Consumer Token Secret*.
@@ -38,8 +39,9 @@ public struct OAuthAuthentication {
                 consumerToken: String, consumerTokenSecret: String,
                 token: String? = nil, tokenSecret: String? = nil,
                 verifier: String? = nil, nonce: String = UUID().uuidString,
-                hashAlgorithm: HashAlgorithm = SHA1HashAlgorithm(), version: OAuthVersion = .v01,
-                timestamp: String = String(Date().timeIntervalSince1970)) {
+                hashAlgorithm: HashAlgorithm = SHA1HashAlgorithm(), version: OAuthVersion = .v1,
+                timestamp: String = String(Date().timeIntervalSince1970),
+                queryParameters: [URLQueryItem] = [URLQueryItem]()) {
         self.fullPath = fullPath
         self.method = method
         self.consumerToken = consumerToken
@@ -51,6 +53,7 @@ public struct OAuthAuthentication {
         self.version = version
         self.hashAlgorithm = hashAlgorithm
         self.timestamp = timestamp
+        self.queryParameters = queryParameters
     }
 
     /// Signing key for generating `OAuth Signature`
@@ -80,7 +83,10 @@ public struct OAuthAuthentication {
     private var signatureBaseString: String {
         let methodString = method.rawValue.addingPercentEncoding(withAllowedCharacters: .oauthSignatureAllowed) ?? ""
         let pathString = fullPath.addingPercentEncoding(withAllowedCharacters: .oauthSignatureAllowed) ?? ""
-        let parameterString = baseParams.urlEncoded.addingPercentEncoding(withAllowedCharacters: .oauthSignatureAllowed) ?? ""
+        var params = baseParams
+        params.append(contentsOf: queryParameters)
+        params.sort { $0.name < $1.name }
+        let parameterString = params.urlEncoded.addingPercentEncoding(withAllowedCharacters: .oauthSignatureAllowed) ?? ""
         return [methodString, pathString, parameterString].joined(separator: "&")
     }
 

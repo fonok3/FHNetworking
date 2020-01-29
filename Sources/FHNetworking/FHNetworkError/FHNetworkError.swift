@@ -22,20 +22,19 @@ public enum FHNetworkError: Error {
     /// No user has been set to the service.
     case noUser
 
-    /// Readable description of error
     public var localizedDescription: String {
         switch self {
-        case let .httpError(status, data):
-            let data = data ?? "".data(using: .utf8)!
-            return "HTTP Error: \(status) \n\(String(bytes: data, encoding: .utf8) ?? "")"
-        case let .decodingError(error):
-            return "Decoding Error: \(error?.localizedDescription ?? "Unknown")"
-        case .requestCreationFailed:
-            return "Request could not be created"
-        case .noData:
-            return "Response does not include any data."
-        case .noUser:
-            return "No user has been set to the service."
+            case let .httpError(status, data):
+                let data = data ??  "".data(using: .utf8)!
+                return "HTTP Error: \(status) \n\(String(bytes: data, encoding: .utf8) ?? "")"
+            case let .decodingError(error):
+                return "Decoding Error: \(error?.localizedDescription ?? "Unknown")"
+            case .requestCreationFailed:
+                return "Request could not be created"
+            case .noData:
+                return "Response does not include any data."
+            case .noUser:
+                return "No user has been set to the service."
         }
     }
 }
