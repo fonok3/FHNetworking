@@ -9,7 +9,7 @@ import Foundation
 ///
 /// - Author: Florian Herzog
 /// - Version: 1.0
-public final class OAuthNetworkService: FHNetworkService {
+open class OAuthNetworkService: FHNetworkService {
     // MARK: Attributes
 
     /// The url to which all requests are build relatively

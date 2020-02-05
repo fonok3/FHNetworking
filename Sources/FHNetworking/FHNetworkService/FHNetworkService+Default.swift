@@ -9,7 +9,9 @@ import Foundation
 extension FHNetworkService {
     /// Defaults to unmodified JSON decoder.
     public var decoder: JSONDecoder {
-        return JSONDecoder()
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        return decoder
     }
 
     /// Defaults to session with default configuration
