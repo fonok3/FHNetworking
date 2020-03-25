@@ -55,16 +55,22 @@ open class OAuthViewController: UIViewController, OAuthAuthoriationHandler {
     }
 
     private func session(url: URL, callbackURLScheme: String?, completionHandler: @escaping (URL?, Error?) -> Void) -> FHAuthenticatingSession {
-        if #available(iOS 12, *) {
+        #if targetEnvironment(macCatalyst)
             let session = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
-            if #available(iOS 13.0, *) {
-                session.presentationContextProvider = self
+            session.presentationContextProvider = self
+            return session
+        #else
+            if #available(iOS 12, *) {
+                let session = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
+                if #available(iOS 13.0, *) {
+                    session.presentationContextProvider = self
+                }
+                return session
+            } else {
+                let session = SFAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
+                return session
             }
-            return session
-        } else {
-            let session = SFAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
-            return session
-        }
+        #endif
     }
 }
 
@@ -88,6 +94,8 @@ protocol FHAuthenticatingSession {
 @available(iOS 12.0, *)
 extension ASWebAuthenticationSession: FHAuthenticatingSession {}
 
+#if !targetEnvironment(macCatalyst)
 @available(iOS 11.0, *)
 extension SFAuthenticationSession: FHAuthenticatingSession {}
+#endif
 #endif
