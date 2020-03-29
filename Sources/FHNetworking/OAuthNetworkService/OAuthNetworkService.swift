@@ -12,6 +12,8 @@ import Foundation
 open class OAuthNetworkService: FHNetworkService {
     // MARK: Attributes
 
+    public var session: URLSession = { URLSession(configuration: .default) }()
+
     /// The url to which all requests are build relatively
     public private(set) var baseUrl: String
 

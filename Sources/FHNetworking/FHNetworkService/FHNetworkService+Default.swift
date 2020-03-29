@@ -14,11 +14,6 @@ extension FHNetworkService {
         return decoder
     }
 
-    /// Defaults to session with default configuration
-    public var session: URLSession {
-        return URLSession(configuration: .default)
-    }
-
     /// Executes network request with an optional data response.
     ///
     /// The method converts the given request to an `URLRequest` for requesting with `URLSession`.
