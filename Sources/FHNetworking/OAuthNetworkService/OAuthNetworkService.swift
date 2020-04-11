@@ -75,10 +75,16 @@ open class OAuthNetworkService: FHNetworkService {
         self.callbackUrl = callbackUrl
     }
 
-    /// Authorizes the current *OAuthNetworkService* with known *Access Token* and *Access Token Secret*
+    /// Authorizes the current *OAuthNetworkService* with known *Access Token* and *Access Token Secret*.
     public func authorize(with accessToken: String, and accessTokenSecret: String) {
         self.accessToken = accessToken
         self.accessTokenSecret = accessTokenSecret
+    }
+
+    /// Deauthorizes the current *OAuthNetworkService*. Deleted the *access token* and *access token secret*.
+    public func deauthorize() {
+        self.accessToken = nil
+        self.accessTokenSecret = nil
     }
 
     // MARK: Authorization
