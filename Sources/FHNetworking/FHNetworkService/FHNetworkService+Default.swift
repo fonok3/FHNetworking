@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import os
 
 /// Default implementation for `FHNetworkService`.
 extension FHNetworkService {
@@ -66,6 +67,12 @@ extension FHNetworkService {
             case let .failure(error):
                 guard request.numberOfRetries > retryCount else {
                     return completion(.failure(error))
+                }
+                if #available(iOS 12.0, *) {
+                    os_log(.error, "Retry %d for request: %@, error: %@",
+                           (retryCount + 1),
+                           request.path,
+                           error.localizedDescription)
                 }
                 self.request(request,
                              additionalParameters: additionalParameters,
