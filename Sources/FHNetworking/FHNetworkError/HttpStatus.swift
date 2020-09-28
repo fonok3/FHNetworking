@@ -20,6 +20,8 @@ public enum HttpStatus {
             self = .success
         } else if statusCode == 401 {
             self = .unauthorized
+        } else if statusCode == 404 {
+            self = .notFound
         } else if 400 ..< 500 ~= statusCode {
             self = .clientError(status: statusCode, error: error)
         } else if 500 ..< 600 ~= statusCode {
@@ -33,6 +35,8 @@ public enum HttpStatus {
     case success
     /// Unauthorized request
     case unauthorized
+    /// Endpoint not found
+    case notFound
     /// Server Errors
     case serverError(status: Int, error: Error?)
     /// Client Errors
