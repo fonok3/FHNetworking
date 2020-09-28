@@ -22,7 +22,7 @@ extension FHNetworkRequest {
         urlComponents.scheme = baseURL.scheme
         urlComponents.host = baseURL.host
         urlComponents.path = baseURL.path + path.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-        urlComponents.queryItems = parameters.filter { !additionalParameters.map { $0.name }.contains($0.name)}
+        urlComponents.queryItems = parameters.filter { !additionalParameters.map { $0.name }.contains($0.name) }
         urlComponents.queryItems?.append(contentsOf: additionalParameters)
 
         guard let finalURL = urlComponents.url else {

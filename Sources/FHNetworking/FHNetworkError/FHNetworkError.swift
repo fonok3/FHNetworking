@@ -8,7 +8,7 @@ import Foundation
 /// Errors which occurs while executing network requests
 public enum FHNetworkError: Error {
     /// HTTP Error
-    case httpError(HttpStatus, Data?)
+    case httpError(HttpStatus, String?, Int)
 
     /// Error while decoding JSON response.
     case decodingError(DecodingError?)
@@ -24,17 +24,16 @@ public enum FHNetworkError: Error {
 
     public var localizedDescription: String {
         switch self {
-            case let .httpError(status, data):
-                let data = data ??  "".data(using: .utf8)!
-                return "HTTP Error: \(status) \n\(String(bytes: data, encoding: .utf8) ?? "")"
-            case let .decodingError(error):
-                return "Decoding Error: \(error?.localizedDescription ?? "Unknown")"
-            case .requestCreationFailed:
-                return "Request could not be created"
-            case .noData:
-                return "Response does not include any data."
-            case .noUser:
-                return "No user has been set to the service."
+        case let .httpError(status, message, retries):
+            return "HTTP Error \(status) (\(retries) retries):\n\t\(message ?? "No message")"
+        case let .decodingError(error):
+            return "Decoding Error: \(error?.localizedDescription ?? "Unknown")"
+        case .requestCreationFailed:
+            return "Request could not be created"
+        case .noData:
+            return "Response does not include any data."
+        case .noUser:
+            return "No user has been set to the service."
         }
     }
 }

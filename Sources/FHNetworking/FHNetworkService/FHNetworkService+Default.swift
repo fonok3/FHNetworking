@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import os
 
 /// Default implementation for `FHNetworkService`.
 extension FHNetworkService {
@@ -26,6 +27,7 @@ extension FHNetworkService {
     @discardableResult
     public func request(_ request: FHNetworkRequest,
                         additionalParameters: [URLQueryItem] = [URLQueryItem](),
+                        retryCount: Int = 0,
                         completion: @escaping (Result<Data?, FHNetworkError>) -> Void) -> URLSessionDataTask? {
         guard var urlRequest = request.request(with: self.baseUrl, additionalParameters: additionalParameters) else {
             completion(.failure(.requestCreationFailed))
@@ -34,7 +36,21 @@ extension FHNetworkService {
         if let authorization = authorizationHeader(for: request) {
             urlRequest.addValue(authorization, forHTTPHeaderField: "Authorization")
         }
-        return self.request(with: urlRequest, completion: completion)
+        return self.request(with: urlRequest, retryCount: retryCount) { (result) in
+            switch result {
+            case .success:
+                return completion(result)
+            case let .failure(error):
+                guard request.numberOfRetries > retryCount else {
+                    return completion(.failure(error))
+                }
+                self.request(request,
+                             additionalParameters: additionalParameters,
+                             retryCount: retryCount + 1,
+                             completion: completion)
+            }
+
+        }
     }
 
     /// Executes network request with a JSON response.
@@ -50,6 +66,7 @@ extension FHNetworkService {
     @discardableResult
     public func request<T: Decodable>(_ request: FHNetworkRequest,
                                       additionalParameters: [URLQueryItem] = [URLQueryItem](),
+                                      retryCount: Int = 0,
                                       completion: @escaping (Result<T, FHNetworkError>) -> Void) -> URLSessionDataTask? {
         return self.request(request, additionalParameters: additionalParameters) { result in
             switch result {
@@ -74,6 +91,7 @@ extension FHNetworkService {
     ///     - completion: Handler for the request result
     /// - Returns: The created url session task
     private func request(with request: URLRequest,
+                         retryCount: Int = 0,
                          completion: @escaping (Result<Data?, FHNetworkError>) -> Void) -> URLSessionDataTask? {
         let dataTask = session.dataTask(with: request) { data, response, error in
             let statusCode = (response as? HTTPURLResponse)?.statusCode
@@ -83,7 +101,7 @@ extension FHNetworkService {
             case .success:
                 completion(.success(data))
             default:
-                completion(.failure(.httpError(statusType, data)))
+                completion(.failure(.httpError(statusType, data.utf8Sting, retryCount)))
             }
         }
 
@@ -103,5 +121,12 @@ extension FHNetworkService {
     /// - Returns: `URL` with combined url string
     public func urlFor(path: String) -> URL? {
         return URL(string: baseUrl + path)
+    }
+}
+
+extension Optional where Wrapped == Data {
+    var utf8Sting: String? {
+        guard let data = self else { return nil }
+        return String(bytes: data, encoding: .utf8)
     }
 }

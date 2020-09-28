@@ -59,4 +59,7 @@ enum OAuthNetworkRequest: FHNetworkRequest {
             return verifier
         }
     }
+
+    /// Number of times the request is retried after an error occured
+    var numberOfRetries: Int { 3 }
 }

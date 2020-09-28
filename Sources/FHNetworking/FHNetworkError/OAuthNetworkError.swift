@@ -16,11 +16,11 @@ public enum OAuthNetworkError: Error {
     public var localizedDescription: String {
         switch self {
         case let .getRequestTokenFailed(error):
-            return "Error getting Reqeust Token:\n" + (error?.localizedDescription ?? "")
+            return "Error getting Reqeust Token:\n\t" + (error?.localizedDescription ?? "")
         case let .authorizationFailed(error):
-            return "Error authorizing token:\n" + (error?.localizedDescription ?? "")
+            return "Error authorizing token:\n\t" + (error?.localizedDescription ?? "")
         case let .getAccessTokenFailed(error):
-            return "Error getting Access Token:\n" + (error?.localizedDescription ?? "")
+            return "Error getting Access Token:\n\t" + (error?.localizedDescription ?? "")
         }
     }
 }

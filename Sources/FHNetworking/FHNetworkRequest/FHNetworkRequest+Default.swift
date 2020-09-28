@@ -31,4 +31,7 @@ public extension FHNetworkRequest {
     var body: Data? {
         return nil
     }
+
+    /// Number of times the request is retried after an error occured
+    var numberOfRetries: Int { 1 }
 }

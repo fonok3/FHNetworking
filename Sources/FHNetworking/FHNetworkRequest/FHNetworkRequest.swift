@@ -24,4 +24,7 @@ public protocol FHNetworkRequest {
 
     /// Request body
     var body: Data? { get }
+
+    /// Number of times the request is retried after an error occured
+    var numberOfRetries: Int { get }
 }
