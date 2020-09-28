@@ -31,7 +31,9 @@
         open func authorizationCompleted(with _:
             Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) {}
 
-        public func authorize(url: URL, callbackUrl: String?, completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void) {
+        public func authorize(url: URL,
+                              callbackUrl: String?,
+                              completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void) {
             DispatchQueue.main.async {
                 self.session = self.session(url: url, callbackURLScheme: callbackUrl) { url, _ in
 
@@ -53,20 +55,25 @@
             }
         }
 
-        private func session(url: URL, callbackURLScheme: String?, completionHandler: @escaping (URL?, Error?) -> Void) -> FHAuthenticatingSession {
+        private func session(url: URL,
+                             callbackURLScheme: String?,
+                             completionHandler: @escaping (URL?, Error?) -> Void) -> FHAuthenticatingSession {
             #if targetEnvironment(macCatalyst)
-                let session = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
+                let session = ASWebAuthenticationSession(
+                    url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
                 session.presentationContextProvider = self
                 return session
             #else
                 if #available(iOS 12, *) {
-                    let session = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
+                    let session = ASWebAuthenticationSession(
+                        url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
                     if #available(iOS 13.0, *) {
                         session.presentationContextProvider = self
                     }
                     return session
                 } else {
-                    let session = SFAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
+                    let session = SFAuthenticationSession(
+                        url: url, callbackURLScheme: callbackURLScheme, completionHandler: completionHandler)
                     return session
                 }
             #endif
