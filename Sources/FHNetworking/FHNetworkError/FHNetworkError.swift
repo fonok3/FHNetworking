@@ -8,7 +8,7 @@ import Foundation
 /// Errors which occurs while executing network requests
 public enum FHNetworkError: Error {
     /// HTTP Error
-    case httpError(HttpStatus, Data?)
+    case httpError(HttpStatus, String?)
 
     /// Error while decoding JSON response.
     case decodingError(DecodingError?)
@@ -24,9 +24,8 @@ public enum FHNetworkError: Error {
 
     public var localizedDescription: String {
         switch self {
-            case let .httpError(status, data):
-                let data = data ??  "".data(using: .utf8)!
-                return "HTTP Error: \(status) \n\(String(bytes: data, encoding: .utf8) ?? "")"
+            case let .httpError(status, message):
+                return "HTTP Error: \(status) \n\(message ?? "")"
             case let .decodingError(error):
                 return "Decoding Error: \(error?.localizedDescription ?? "Unknown")"
             case .requestCreationFailed:
