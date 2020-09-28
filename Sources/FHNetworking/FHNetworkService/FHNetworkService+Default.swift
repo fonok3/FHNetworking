@@ -36,7 +36,21 @@ extension FHNetworkService {
         if let authorization = authorizationHeader(for: request) {
             urlRequest.addValue(authorization, forHTTPHeaderField: "Authorization")
         }
-        return self.request(with: urlRequest, retryCount: retryCount, completion: completion)
+        return self.request(with: urlRequest, retryCount: retryCount) { (result) in
+            switch result {
+            case .success:
+                return completion(result)
+            case let .failure(error):
+                guard request.numberOfRetries > retryCount else {
+                    return completion(.failure(error))
+                }
+                self.request(request,
+                             additionalParameters: additionalParameters,
+                             retryCount: retryCount + 1,
+                             completion: completion)
+            }
+
+        }
     }
 
     /// Executes network request with a JSON response.
@@ -65,19 +79,7 @@ extension FHNetworkService {
                     completion(.failure(.decodingError(error as? DecodingError)))
                 }
             case let .failure(error):
-                guard request.numberOfRetries > retryCount else {
-                    return completion(.failure(error))
-                }
-                if #available(iOS 12.0, *) {
-                    os_log(.error, "Retry %d for request: %@, error: %@",
-                           (retryCount + 1),
-                           request.path,
-                           error.localizedDescription)
-                }
-                self.request(request,
-                             additionalParameters: additionalParameters,
-                             retryCount: retryCount + 1,
-                             completion: completion)
+                completion(.failure(error))
             }
         }
     }
@@ -89,7 +91,7 @@ extension FHNetworkService {
     ///     - completion: Handler for the request result
     /// - Returns: The created url session task
     private func request(with request: URLRequest,
-                         retryCount _: Int = 0,
+                         retryCount: Int = 0,
                          completion: @escaping (Result<Data?, FHNetworkError>) -> Void) -> URLSessionDataTask? {
         let dataTask = session.dataTask(with: request) { data, response, error in
             let statusCode = (response as? HTTPURLResponse)?.statusCode
@@ -99,7 +101,7 @@ extension FHNetworkService {
             case .success:
                 completion(.success(data))
             default:
-                completion(.failure(.httpError(statusType, data.utf8Sting)))
+                completion(.failure(.httpError(statusType, data.utf8Sting, retryCount)))
             }
         }
 
