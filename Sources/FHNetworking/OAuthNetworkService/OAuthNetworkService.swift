@@ -164,19 +164,16 @@ open class OAuthNetworkService: FHNetworkService {
 
     // MARK: Get Request Token
 
-    /// Number of tries to get the *OAuthRequestToken*.
-    private var requestRequestTokenTries = 0
-
     /// Requests the *Request Token*.
     ///
     /// - Parameters:
     ///     - completion: The handler for processing the request result.
-    func getRequestToken(completion: @escaping (Result<(requestToken: String, requestTokenSecret: String), OAuthNetworkError>) -> Void) {
+    func getRequestToken(
+        completion: @escaping (Result<(requestToken: String, requestTokenSecret: String), OAuthNetworkError>) -> Void) {
         let request = OAuthNetworkRequest.requestRequestToken(path: requestTokenPath)
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
             case let .success(response):
-                self.requestRequestTokenTries = 0
                 guard let data = response, let query = String(bytes: data, encoding: .utf8),
                     let responseDic = query.decodeQueryEncoded(),
                     responseDic["oauth_callback_confirmed"] == "1",
@@ -188,16 +185,9 @@ open class OAuthNetworkService: FHNetworkService {
                 completion(.success((requestToken: requestToken,
                                      requestTokenSecret: requestTokenSecret)))
             case let .failure(error):
-                guard self.requestRequestTokenTries < 5 else {
-                    completion(.failure(.getRequestTokenFailed(error)))
-                    self.requestRequestTokenTries = 0
-                    return
-                }
-                print("\(self.requestRequestTokenTries) try for getting request token: \(error.localizedDescription)")
-                self.getRequestToken(completion: completion)
+                completion(.failure(.getRequestTokenFailed(error)))
             }
         }
-        requestRequestTokenTries += 1
     }
 
     // MARK: Authorize Request Token
@@ -209,9 +199,10 @@ open class OAuthNetworkService: FHNetworkService {
     ///     - requestTokenSecret: The temporary *OAuth Request Token Secret*.
     ///     - authorizationHandler: Handler for user authorization.
     ///     - completion: The handler for processing the request result.
-    private func authorizeRequestToken(requestToken: String, requestTokenSecret: String,
-                                       with authorizationHandler: OAuthAuthoriationHandler,
-                                       completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void) {
+    private func authorizeRequestToken(
+        requestToken: String, requestTokenSecret: String,
+        with authorizationHandler: OAuthAuthoriationHandler,
+        completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void) {
         guard let authorizeUrl = self.authorizeUrlFrom(requestToken: requestToken,
                                                        requestTokenSecret: requestTokenSecret) else {
             completion(.failure(.authorizationFailed(.requestCreationFailed)))
@@ -234,22 +225,21 @@ open class OAuthNetworkService: FHNetworkService {
 
     // MARK: Get Access Token
 
-    /// Number of tries to get the *OAuthAccessToken*.
-    private var requestAccessTokenTries = 0
-
     /// Requests the  permanent *Access Token*.
     ///
     /// - Parameters:
     ///     - requestToken: The temporary *OAuth Request Token*.
     ///     - requestTokenSecret: The temporary *OAuth Request Token Secret*.
     ///     - completion: The handler for processing the request result
-    func getAccessTokenWith(requestToken: String, requestTokenSecret: String, oauthVerifier: String,
-                            completion: @escaping (Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) -> Void) {
-        let request = OAuthNetworkRequest.requestAccessToken(path: accessTokenPath, token: requestToken, tokenSecret: requestTokenSecret, verifier: oauthVerifier)
+    func getAccessTokenWith(
+        requestToken: String, requestTokenSecret: String, oauthVerifier: String,
+        completion: @escaping (Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) -> Void) {
+        let request = OAuthNetworkRequest.requestAccessToken(path: accessTokenPath,
+                                                             token: requestToken, tokenSecret: requestTokenSecret,
+                                                             verifier: oauthVerifier)
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
             case let .success(response):
-                self.requestAccessTokenTries = 0
                 guard let data = response, let query = String(bytes: data, encoding: .utf8),
                     let responseDic = query.decodeQueryEncoded(),
                     let requestToken = responseDic["oauth_token"] as? String,
@@ -260,16 +250,8 @@ open class OAuthNetworkService: FHNetworkService {
                 completion(.success((accessToken: requestToken,
                                      accessTokenSecret: requestTokenSecret)))
             case let .failure(error):
-                guard self.requestAccessTokenTries < 5 else {
-                    completion(.failure(.getRequestTokenFailed(error)))
-                    self.requestAccessTokenTries = 0
-                    return
-                }
-                print("\(self.requestAccessTokenTries) try for getting accesss token: \(error.localizedDescription)")
-                self.getAccessTokenWith(requestToken: requestToken, requestTokenSecret: requestTokenSecret,
-                                        oauthVerifier: oauthVerifier, completion: completion)
+                completion(.failure(.getRequestTokenFailed(error)))
             }
         }
-        requestAccessTokenTries += 1
     }
 }
