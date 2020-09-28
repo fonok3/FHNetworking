@@ -83,8 +83,8 @@ open class OAuthNetworkService: FHNetworkService {
 
     /// Deauthorizes the current *OAuthNetworkService*. Deleted the *access token* and *access token secret*.
     public func deauthorize() {
-        self.accessToken = nil
-        self.accessTokenSecret = nil
+        accessToken = nil
+        accessTokenSecret = nil
     }
 
     // MARK: Authorization
@@ -169,7 +169,8 @@ open class OAuthNetworkService: FHNetworkService {
     /// - Parameters:
     ///     - completion: The handler for processing the request result.
     func getRequestToken(
-        completion: @escaping (Result<(requestToken: String, requestTokenSecret: String), OAuthNetworkError>) -> Void) {
+        completion: @escaping (Result<(requestToken: String, requestTokenSecret: String), OAuthNetworkError>) -> Void
+    ) {
         let request = OAuthNetworkRequest.requestRequestToken(path: requestTokenPath)
         self.request(request) { (result: Result<Data?, FHNetworkError>) in
             switch result {
@@ -202,7 +203,8 @@ open class OAuthNetworkService: FHNetworkService {
     private func authorizeRequestToken(
         requestToken: String, requestTokenSecret: String,
         with authorizationHandler: OAuthAuthoriationHandler,
-        completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void) {
+        completion: @escaping (Result<(oauthToken: String, oauthVerifier: String), OAuthNetworkError>) -> Void
+    ) {
         guard let authorizeUrl = self.authorizeUrlFrom(requestToken: requestToken,
                                                        requestTokenSecret: requestTokenSecret) else {
             completion(.failure(.authorizationFailed(.requestCreationFailed)))
@@ -233,7 +235,8 @@ open class OAuthNetworkService: FHNetworkService {
     ///     - completion: The handler for processing the request result
     func getAccessTokenWith(
         requestToken: String, requestTokenSecret: String, oauthVerifier: String,
-        completion: @escaping (Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) -> Void) {
+        completion: @escaping (Result<(accessToken: String, accessTokenSecret: String), OAuthNetworkError>) -> Void
+    ) {
         let request = OAuthNetworkRequest.requestAccessToken(path: accessTokenPath,
                                                              token: requestToken, tokenSecret: requestTokenSecret,
                                                              verifier: oauthVerifier)

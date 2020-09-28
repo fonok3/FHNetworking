@@ -82,7 +82,7 @@ extension FHNetworkService {
     ///     - completion: Handler for the request result
     /// - Returns: The created url session task
     private func request(with request: URLRequest,
-                         retryCount: Int = 0,
+                         retryCount _: Int = 0,
                          completion: @escaping (Result<Data?, FHNetworkError>) -> Void) -> URLSessionDataTask? {
         let dataTask = session.dataTask(with: request) { data, response, error in
             let statusCode = (response as? HTTPURLResponse)?.statusCode

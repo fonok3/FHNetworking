@@ -3,8 +3,8 @@
 //  Copyright © 2019, Florian Herzog
 //
 
-import Foundation
 import FHNetworking
+import Foundation
 
 final class FeedlyNetworkService: FHNetworkService {
     var session: URLSession = .shared
